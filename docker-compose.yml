@@ -141,12 +141,12 @@ networks:
     ipam:
       config:
         - subnet: 192.168.81.0/24
-	- gateway: 192.168.81.1
-	- ip_range: 192.168.81.104/30
+	  gateway: 192.168.81.1
+	  ip_range: 192.168.81.104/30
   pihole-bridge:
     driver: bridge
     ipam:
       config:
         - subnet: 192.168.72.0/24
-	- gateway: 192.168.72.1
-	- ip_range: 192.168.72.2/32
+	  gateway: 192.168.72.1
+	  ip_range: 192.168.72.2/32
