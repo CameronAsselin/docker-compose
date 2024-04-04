@@ -35,8 +35,8 @@ services:
       - 80:80/tcp
       #- 67:67/udp # Only required if using pihole as DHCP server
     volumes:
-      - /home/pi4/docker/pihole/:/etc/pihole
-      - /home/pi4/docker/pihole/:/etc/dnsmasq.d
+      - /home/pi4/docker/pihole/etc-pihole:/etc/pihole
+      - /home/pi4/docker/pihole/etc-dnsmasq.d:/etc/dnsmasq.d
     #cap_add:
       #- NET_ADMIN # Only required if using pihole as DHCP server
     restart: unless-stopped
