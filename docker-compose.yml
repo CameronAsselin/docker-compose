@@ -22,7 +22,7 @@ services:
       - FTLCONF_LOCAL_IPV4=192.168.0.104
       - PIHOLE_DNS=192.168.0.105
       - TZ=America/New_York
-      - WEBPASSWORD=???
+      - WEBPASSWORD=??? #Add custom secure password
     ports:
       - 53:53/tcp
       - 53:53/udp
@@ -64,9 +64,9 @@ services:
       - /home/pi4/docker/qbittorrent:/config
       - /mnt/NAS/downloads:/downloads
     ports:
-      - 12345:8080
-      - 12346:6881
-      - 12346:6881/udp
+      - 12345:12345
+      - 12346:12346
+      - 12346:12346/udp
     restart: unless-stopped
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
