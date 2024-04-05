@@ -5,8 +5,8 @@ services:
     container_name: homer
     image: b4bz/homer:latest
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=1001
+      - PGID=1001
       - TZ=America/New_York
     ports:
       - 420:8080
@@ -55,8 +55,8 @@ services:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=1001
+      - PGID=1001
       - TZ=America/New_York
       - WEBUI_PORT=12345
       - TORRENTING_PORT=12346
@@ -74,8 +74,8 @@ services:
     depends_on:
       - qbittorrent
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=1001
+      - PGID=1001
       - TZ=America/New_York
     ports:
       - 9696:9696
@@ -102,8 +102,8 @@ services:
       - qbittorrent
       - prowlarr
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=1001
+      - PGID=1001
       - TZ=America/New_York
     ports:
       - 8989:8989
@@ -120,8 +120,8 @@ services:
       - qbittorrent
       - prowlarr
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=1001
+      - PGID=1001
       - TZ=America/New_York
     ports:
       - 7878:7878
