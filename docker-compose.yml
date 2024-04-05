@@ -136,7 +136,7 @@ networks:
   pihole-unbound-macvlan:
     driver: macvlan
     driver_opts:
-      parent: eth0 #Double check this interface <ip link show>
+      parent: eth0
     ipam:
       config:
         - subnet: 192.168.0.0/24
