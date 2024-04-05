@@ -1,16 +1,6 @@
-version: "3"
+version: "3.8"
+
 services:
-  flaresolverr:
-    container_name: flaresolverr
-    image: ghcr.io/flaresolverr/flaresolverr:latest
-    environment:
-      - LOG_LEVEL=${LOG_LEVEL:-info}
-      - LOG_HTML=${LOG_HTML:-false}
-      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
-      - TZ=America/New_York
-    ports:
-      - 8191:8191
-    restart: unless-stopped
   homer:
     container_name: homer
     image: b4bz/homer:latest
@@ -27,22 +17,62 @@ services:
     container_name: pihole
     image: pihole/pihole:latest
     environment:
+      - DNSMASQ_USER=root
+      - DNSMASQ_LISTENING=local
+      - FTLCONF_LOCAL_IPV4=192.168.0.104
+      - PIHOLE_DNS=192.168.0.105
       - TZ=America/New_York
-      - WEBPASSWORD=???
+      - WEBPASSWORD=??? #Add custom secure password
     ports:
       - 53:53/tcp
       - 53:53/udp
       - 80:80/tcp
-      #- 67:67/udp # Only required if using pihole as DHCP server
+      #- 67:67/udp #Only required if using pihole as DHCP server
     volumes:
       - /home/pi4/docker/pihole/etc-pihole:/etc/pihole
       - /home/pi4/docker/pihole/etc-dnsmasq.d:/etc/dnsmasq.d
-    #cap_add:
-      #- NET_ADMIN # Only required if using pihole as DHCP server
+    networks:
+      pihole-unbound-macvlan:
+        ipv4_address: 192.168.0.104
+      pihole-bridge:
+        ipv4_address: 192.168.72.2
+    #cap_add: #Only required if using pihole as DHCP server
+    #  - NET_ADMIN 
+    restart: unless-stopped
+  unbound:
+    container_name: unbound
+    image: klutchell/unbound:latest
+    depends_on: 
+      - pihole
+    ports:
+      - 53:53/tcp
+      - 53:53/udp
+    networks:
+      pihole-unbound-macvlan:
+        ipv4_address: 192.168.0.105
+    restart: unless-stopped
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+      - WEBUI_PORT=12345
+      - TORRENTING_PORT=12346
+    volumes:
+      - /home/pi4/docker/qbittorrent:/config
+      - /mnt/NAS/downloads:/downloads
+    ports:
+      - 12345:12345
+      - 12346:12346
+      - 12346:12346/udp
     restart: unless-stopped
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
-    container_name: prowlarr 
+    container_name: prowlarr
+    depends_on:
+      - qbittorrent
     environment:
       - PUID=1000
       - PGID=1000
@@ -52,9 +82,25 @@ services:
     volumes:
       - /home/pi4/docker/prowlarr/config:/config
     restart: unless-stopped
+  flaresolverr:
+    container_name: flaresolverr
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    depends_on:
+      - prowlarr
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_HTML=${LOG_HTML:-false}
+      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+      - TZ=America/New_York
+    ports:
+      - 8191:8191
+    restart: unless-stopped
   sonarr:
     container_name: sonarr
     image: lscr.io/linuxserver/sonarr:latest
+    depends_on:
+      - qbittorrent
+      - prowlarr
     environment:
       - PUID=1000
       - PGID=1000
@@ -70,6 +116,9 @@ services:
   radarr:
     container_name: radarr
     image: lscr.io/linuxserver/radarr:latest
+    depends_on:
+      - qbittorrent
+      - prowlarr
     environment:
       - PUID=1000
       - PGID=1000
@@ -82,3 +131,21 @@ services:
       - /mnt/NAS/shared/anime/movies:/anime
       - /mnt/NAS/downloads:/downloads
     restart: unless-stopped
+
+networks:
+  pihole-unbound-macvlan:
+    driver: macvlan
+    driver_opts:
+      parent: eth0
+    ipam:
+      config:
+        - subnet: 192.168.0.0/24
+          gateway: 192.168.0.1
+          ip_range: 192.168.0.104/30
+  pihole-bridge:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.72.0/24
+          gateway: 192.168.72.1
+          ip_range: 192.168.72.2/32
