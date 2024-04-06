@@ -44,6 +44,8 @@ services:
     image: klutchell/unbound:latest
     depends_on: 
       - pihole
+    volumes:
+      - /home/pi4/docker/unbound/:/etc/unbound/
     ports:
       - 53:53/tcp
       - 53:53/udp
