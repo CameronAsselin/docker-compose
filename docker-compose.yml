@@ -70,6 +70,18 @@ services:
       - /mnt/NAS/shared/anime/shows:/anime/shows
       - /mnt/NAS/shared/anime/movies:/anime/movies
     restart: unless-stopped
+  audiobookshelf:
+    image: ghcr.io/advplyr/audiobookshelf:latest
+    environment:
+      - TZ=America/New_York
+    volumes:
+      - /mnt/NAS/shared/audiobooks:/audiobooks
+      - /mnt/NAS/shared/podcasts:/podcasts
+      - /mnt/NAS/shared/books:/books
+      - /home/pi4/docker/audiobookshelf/config:/config
+      - /home/pi4/docker/audiobookshelf/metadata:/metadata
+    ports:
+      - 13378:80
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
