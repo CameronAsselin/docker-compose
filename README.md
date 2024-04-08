@@ -6,6 +6,7 @@ This is the docker-compose.yml file used to spin up docker containers on my home
 - Pihole
 - Unbound
 - Plex
+- Audiobookshelf
 - qBittorrent
 - Prowlarr
 - Flaresolverr
