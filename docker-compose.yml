@@ -70,6 +70,19 @@ services:
       - /mnt/NAS/shared/anime/shows:/anime/shows
       - /mnt/NAS/shared/anime/movies:/anime/movies
     restart: unless-stopped
+  kavita:
+    image: lscr.io/linuxserver/kavita:latest
+    container_name: kavita
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ=America/New_York
+    volumes:
+      - /home/pi4/docker/kavita:/config
+      - /mnt/NAS/shared/books:/books
+    ports:
+      - 5000:5000
+    restart: unless-stopped
   audiobookshelf:
     image: ghcr.io/advplyr/audiobookshelf:latest
     environment:
@@ -161,6 +174,25 @@ services:
       - /mnt/NAS/shared/movies:/movies
       - /mnt/NAS/shared/anime/movies:/anime
       - /mnt/NAS/downloads:/downloads
+    restart: unless-stopped
+  calibre: #Used for adding metadata to ebooks
+    image: lscr.io/linuxserver/calibre:latest
+    container_name: calibre
+    #security_opt:
+    #  - seccomp:unconfined #optional
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ=America/New_York
+      #- PASSWORD= #optional
+      #- CLI_ARGS= #optional
+    volumes:
+      - /home/pi4/docker/calibre:/config
+      - /mnt/NAS/shared/books:/books
+    ports:
+      - 8080:8080
+      - 8181:8181
+      - 8081:8081
     restart: unless-stopped
 
 networks:
