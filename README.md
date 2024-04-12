@@ -20,13 +20,13 @@ The following networks are created for the pihole + unbound recursive DNS server
 - pihole-unbound-macvlan
 - pihole-bridge
 
-To run the file using docker-compose, navigate to the directory the docker-compose.yml file is in, then enter the command:
+To run the file using docker-compose OR update running containers in place, navigate to the directory the docker-compose.yml file is in:
 
 ```
 docker-compose up -d
 ```
 
-To stop and delete all containers and networks using docker-compose, navigate to the directory the docker-compose.yml file is in, then enter the command:
+To stop and delete all containers and networks using docker-compose, navigate to the directory the docker-compose.yml file is in:
 
 ```
 docker-compose down
