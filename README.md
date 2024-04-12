@@ -6,12 +6,14 @@ This is the docker-compose.yml file used to spin up docker containers on my home
 - Pihole
 - Unbound
 - Plex
+- Kavita
 - Audiobookshelf
 - qBittorrent
 - Prowlarr
 - Flaresolverr
 - Sonarr
 - Radarr
+- Calibre
 
 The following networks are created for the pihole + unbound recursive DNS server:
 
