@@ -175,6 +175,17 @@ services:
       - /mnt/NAS/shared/anime/movies:/anime
       - /mnt/NAS/downloads:/downloads
     restart: unless-stopped
+  handbrake:
+    image: jlesage/handbrake:latest
+    container_name: handbrake
+    environment:
+      - PUID=1001
+      - PGID=1001
+      - TZ=America/New_York
+    volumes:
+      - /home/pi4/docker/handbrake/config:/config
+      - /mnt/NAS/downloads/complete:/watch
+      - /mnt/NAS/downloads/encoded:/output
   calibre: #Used for adding metadata to ebooks
     image: lscr.io/linuxserver/calibre:latest
     container_name: calibre
