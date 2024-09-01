@@ -13,6 +13,7 @@ This is the docker-compose.yml file used to spin up docker containers on my home
 - Flaresolverr
 - Sonarr
 - Radarr
+- Handbrake
 - Calibre
 
 The following networks are created for the pihole + unbound recursive DNS server:
