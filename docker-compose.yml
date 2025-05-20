@@ -1,43 +1,58 @@
 version: "3.8"
 
 services:
-  homer:
-    container_name: homer
-    image: b4bz/homer:latest
+  unifi-controller:
+    image: lscr.io/linuxserver/unifi-controller:latest
+    container_name: unifi-controller
     environment:
       - PUID=1001
       - PGID=1001
       - TZ=America/New_York
-    ports:
-      - 420:8080
     volumes:
-      - /home/pi4/docker/homer/assets:/www/assets
+      - /home/docker/docker/unifi/config:/config
+    ports:
+      - 8443:8443
+      - 3478:3478/udp
+      - 10001:10001/udp
+      - 8080:8080
+      - 1900:1900/udp #optional
+      - 8843:8843 #optional
+      - 8880:8880 #optional
+      - 6789:6789 #optional
+      - 5514:5514/udp #optional
+    restart: unless-stopped
+  homarr:
+    container_name: homarr
+    image: ghcr.io/homarr-labs/homarr:latest
+    environment:
+      - SECRET_ENCRYPTION_KEY=28D014F74DA91E7AC847F1A0DC846E12F30D554213A2336A54D2D13FA68CB54 # Set this to a new randomly generated 64 digit hex code
+    ports:
+      - 7575:7575
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /home/docker/docker/homarr/appdata:/appdata
     restart: unless-stopped
   pihole:
     container_name: pihole
     image: pihole/pihole:latest
     environment:
-      - DNSMASQ_USER=root
-      - DNSMASQ_LISTENING=local
-      - FTLCONF_LOCAL_IPV4=192.168.0.104
-      - PIHOLE_DNS=192.168.0.105
       - TZ=America/New_York
-      - WEBPASSWORD=??? #Add custom secure password
+      - FTLCONF_webserver_api_password=??? #Add custom secure password
     ports:
       - 53:53/tcp
       - 53:53/udp
       - 80:80/tcp
-      #- 67:67/udp #Only required if using pihole as DHCP server
+      - 443:443/tcp
+      #- 67:67/udp # Uncomment if using pihole as DHCP server
     volumes:
-      - /home/pi4/docker/pihole/etc-pihole:/etc/pihole
-      - /home/pi4/docker/pihole/etc-dnsmasq.d:/etc/dnsmasq.d
+      - /home/docker/docker/pihole/etc-pihole:/etc/pihole
     networks:
       pihole-unbound-macvlan:
-        ipv4_address: 192.168.0.104
+        ipv4_address: 192.168.1.91
       pihole-bridge:
         ipv4_address: 192.168.72.2
-    #cap_add: #Only required if using pihole as DHCP server
-    #  - NET_ADMIN 
+    #cap_add: # Uncomment if using pihole as DHCP server
+    #  - NET_ADMIN  # Uncomment if using pihole as DHCP server
     restart: unless-stopped
   unbound:
     container_name: unbound
@@ -45,13 +60,13 @@ services:
     depends_on: 
       - pihole
     volumes:
-      - /home/pi4/docker/unbound/:/etc/unbound/
+      - /home/docker/docker/unbound/:/etc/unbound/
     ports:
       - 53:53/tcp
       - 53:53/udp
     networks:
       pihole-unbound-macvlan:
-        ipv4_address: 192.168.0.105
+        ipv4_address: 192.168.0.92
     restart: unless-stopped
   plex:
     image: lscr.io/linuxserver/plex:latest
@@ -64,7 +79,7 @@ services:
       - VERSION=docker
       #- PLEX_CLAIM= #optional
     volumes:
-      - /home/pi4/docker/plex:/config
+      - /home/docker/docker/plex:/config
       - /mnt/NAS/shared/TV/:/tv
       - /mnt/NAS/shared/movies:/movies
       - /mnt/NAS/shared/anime/shows:/anime/shows
@@ -78,7 +93,7 @@ services:
       - PGID=1001
       - TZ=America/New_York
     volumes:
-      - /home/pi4/docker/kavita:/config
+      - /home/docker/docker/kavita:/config
       - /mnt/NAS/shared/books:/books
     ports:
       - 5000:5000
@@ -91,8 +106,8 @@ services:
       - /mnt/NAS/shared/audiobooks:/audiobooks
       - /mnt/NAS/shared/podcasts:/podcasts
       - /mnt/NAS/shared/books:/books
-      - /home/pi4/docker/audiobookshelf/config:/config
-      - /home/pi4/docker/audiobookshelf/metadata:/metadata
+      - /home/docker/docker/audiobookshelf/config:/config
+      - /home/docker/docker/audiobookshelf/metadata:/metadata
     ports:
       - 13378:80
   qbittorrent:
@@ -105,7 +120,7 @@ services:
       - WEBUI_PORT=12345
       - TORRENTING_PORT=12346
     volumes:
-      - /home/pi4/docker/qbittorrent:/config
+      - /home/docker/docker/qbittorrent:/config
       - /mnt/NAS/downloads:/downloads
     ports:
       - 12345:12345
@@ -124,7 +139,7 @@ services:
     ports:
       - 9696:9696
     volumes:
-      - /home/pi4/docker/prowlarr/config:/config
+      - /home/docker/docker/prowlarr/config:/config
     restart: unless-stopped
   flaresolverr:
     container_name: flaresolverr
@@ -152,7 +167,7 @@ services:
     ports:
       - 8989:8989
     volumes:
-      - /home/pi4/docker/sonarr/config:/config
+      - /home/docker/docker/sonarr/config:/config
       - /mnt/NAS/shared/TV:/tv
       - /mnt/NAS/shared/anime/shows:/anime
       - /mnt/NAS/downloads:/downloads
@@ -170,7 +185,7 @@ services:
     ports:
       - 7878:7878
     volumes:
-      - /home/pi4/docker/radarr/config:/config
+      - /home/docker/docker/radarr/config:/config
       - /mnt/NAS/shared/movies:/movies
       - /mnt/NAS/shared/anime/movies:/anime
       - /mnt/NAS/downloads:/downloads
@@ -183,7 +198,7 @@ services:
       - PGID=1001
       - TZ=America/New_York
     volumes:
-      - /home/pi4/docker/handbrake/config:/config
+      - /home/docker/docker/handbrake/config:/config
       - /mnt/NAS/downloads/complete:/watch
       - /mnt/NAS/downloads/encoded:/output
   calibre: #Used for adding metadata to ebooks
@@ -198,7 +213,7 @@ services:
       #- PASSWORD= #optional
       #- CLI_ARGS= #optional
     volumes:
-      - /home/pi4/docker/calibre:/config
+      - /home/docker/docker/calibre:/config
       - /mnt/NAS/shared/books:/books
     ports:
       - 8080:8080
@@ -213,9 +228,9 @@ networks:
       parent: eth0
     ipam:
       config:
-        - subnet: 192.168.0.0/24
-          gateway: 192.168.0.1
-          ip_range: 192.168.0.104/30
+        - subnet: 192.168.1.0/24
+          gateway: 192.168.1.1
+          ip_range: 192.168.1.91/30
   pihole-bridge:
     driver: bridge
     ipam:
