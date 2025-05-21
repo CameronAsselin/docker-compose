@@ -228,7 +228,7 @@ networks:
       config:
         - subnet: 192.168.1.0/24
           gateway: 192.168.1.1
-          ip_range: 192.168.1.91/30
+          ip_range: 192.168.1.88/30
   pihole-bridge:
     driver: bridge
     ipam:
