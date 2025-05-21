@@ -2,7 +2,8 @@
 
 This is the docker-compose.yml file used to spin up docker containers on my home lab. The following containers are created when this docker-compose file is run:
 
-- Homer
+- Unifi Controller
+- Homarr
 - Pihole
 - Unbound
 - Plex
