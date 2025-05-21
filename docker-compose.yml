@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   unifi-controller:
     image: lscr.io/linuxserver/unifi-controller:latest
