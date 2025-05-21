@@ -214,7 +214,7 @@ services:
       - /home/docker/docker/calibre:/config
       - /mnt/NAS/shared/books:/books
     ports:
-      - 8080:8080
+      - 8090:8090
       - 8181:8181
       - 8081:8081
     restart: unless-stopped
