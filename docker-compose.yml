@@ -3,8 +3,6 @@ services:
     image: lscr.io/linuxserver/unifi-controller:latest
     container_name: unifi-controller
     environment:
-      - PUID=1001
-      - PGID=1001
       - TZ=America/New_York
     volumes:
       - /home/docker/docker/unifi/config:/config
@@ -69,8 +67,6 @@ services:
     container_name: plex
     network_mode: host
     environment:
-      - PUID=1001
-      - PGID=1001
       - TZ=America/New_York
       - VERSION=docker
       #- PLEX_CLAIM= #optional
@@ -129,8 +125,8 @@ services:
     depends_on:
       - qbittorrent
     environment:
-      - PUID=1001
-      - PGID=1001
+      - PUID=1029
+      - PGID=100
       - TZ=America/New_York
     ports:
       - 9696:9696
@@ -157,8 +153,8 @@ services:
       - qbittorrent
       - prowlarr
     environment:
-      - PUID=1001
-      - PGID=1001
+      - PUID=1029
+      - PGID=100
       - TZ=America/New_York
     ports:
       - 8989:8989
@@ -175,8 +171,8 @@ services:
       - qbittorrent
       - prowlarr
     environment:
-      - PUID=1001
-      - PGID=1001
+      - PUID=1029
+      - PGID=100
       - TZ=America/New_York
     ports:
       - 7878:7878
@@ -190,8 +186,8 @@ services:
     image: jlesage/handbrake:latest
     container_name: handbrake
     environment:
-      - PUID=1001
-      - PGID=1001
+      - PUID=1029
+      - PGID=100
       - TZ=America/New_York
     volumes:
       - /home/docker/docker/handbrake/config:/config
@@ -203,8 +199,8 @@ services:
     #security_opt:
     #  - seccomp:unconfined #optional
     environment:
-      - PUID=1001
-      - PGID=1001
+      - PUID=1029
+      - PGID=100
       - TZ=America/New_York
       #- PASSWORD= #optional
       #- CLI_ARGS= #optional
