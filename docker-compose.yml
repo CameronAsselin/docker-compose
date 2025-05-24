@@ -23,7 +23,7 @@ services:
     container_name: homarr
     image: ghcr.io/homarr-labs/homarr:latest
     environment:
-      - SECRET_ENCRYPTION_KEY=92cfe8caf286e984d6892c45c15146df542ae894bdd7e1540e76de67099e3b00 # Set this to a new randomly generated 64 digit hex code from https://homarr.dev/docs/getting-started/installation/docker/
+      - SECRET_ENCRYPTION_KEY= # Set this to a new randomly generated 64 digit hex code from https://homarr.dev/docs/getting-started/installation/docker/
     ports:
       - 7575:7575
     volumes:
