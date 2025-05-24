@@ -36,35 +36,33 @@ services:
     environment:
       - TZ=America/New_York
       - FTLCONF_webserver_api_password=??? #Add custom secure password
+      - FTLCONF_dns_listeningMode=all
     ports:
       - 53:53/tcp
       - 53:53/udp
       - 80:80/tcp
       - 443:443/tcp
-      #- 67:67/udp # Uncomment if using pihole as DHCP server
     volumes:
-      - /home/docker/docker/pihole/etc-pihole:/etc/pihole
+      - /home/docker/docker/pihole/etc/pihole:/etc/pihole
     networks:
-      pihole-unbound-macvlan:
-        ipv4_address: 192.168.1.91
+      pihole-network:
+        ipv4_address: 192.168.1.6
+        priority: 1000
       pihole-bridge:
-        ipv4_address: 192.168.72.2
-    #cap_add: # Uncomment if using pihole as DHCP server
-    #  - NET_ADMIN  # Uncomment if using pihole as DHCP server
+        ipv4_address: 192.168.100.2
+        priority: 900
     restart: unless-stopped
   unbound:
     container_name: unbound
     image: klutchell/unbound:latest
-    depends_on: 
-      - pihole
     volumes:
-      - /home/docker/docker/unbound/:/etc/unbound/
+      - /home/docker/docker/unbound:/etc/unbound
     ports:
       - 53:53/tcp
       - 53:53/udp
     networks:
-      pihole-unbound-macvlan:
-        ipv4_address: 192.168.0.92
+      pihole-network:
+        ipv4_address: 192.168.1.5
     restart: unless-stopped
   plex:
     image: lscr.io/linuxserver/plex:latest
@@ -220,19 +218,19 @@ services:
     restart: unless-stopped
 
 networks:
-  pihole-unbound-macvlan:
+  pihole-network:
     driver: macvlan
     driver_opts:
       parent: eth0
     ipam:
       config:
         - subnet: 192.168.1.0/24
+          ip_range: 192.168.1.0/24
           gateway: 192.168.1.1
-          ip_range: 192.168.1.88/30
   pihole-bridge:
     driver: bridge
     ipam:
       config:
-        - subnet: 192.168.72.0/24
-          gateway: 192.168.72.1
-          ip_range: 192.168.72.2/32
+        - subnet: 192.168.100.0/24
+          gateway: 192.168.100.1
+          ip_range: 192.168.100.2/32
