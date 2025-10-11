@@ -191,8 +191,9 @@ services:
       - TZ=America/New_York
     volumes:
       - /home/docker/docker/handbrake/config:/config
-      - /mnt/NAS/downloads/complete:/watch
-      - /mnt/NAS/downloads/encoded:/output
+      - /mnt/NAS/downloads/convert/watch:/watch
+      - /mnt/NAS/downloads/convert/output:/output
+    restart: unless-stopped
   calibre: #Used for adding metadata to ebooks
     image: lscr.io/linuxserver/calibre:latest
     container_name: calibre
@@ -230,3 +231,4 @@ networks:
         - subnet: 192.168.100.0/24
           gateway: 192.168.100.1
           ip_range: 192.168.100.2/32
+
