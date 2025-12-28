@@ -1,21 +1,30 @@
 services:
   unifi-controller:
-    image: lscr.io/linuxserver/unifi-controller:latest
+    image: jacobalberty/unifi:latest
     container_name: unifi-controller
     environment:
       - TZ=America/New_York
     volumes:
-      - /home/docker/docker/unifi/config:/config
+      - /home/docker/unifi:/unifi
     ports:
       - 8443:8443
       - 3478:3478/udp
-      - 10001:10001/udp
       - 8080:8080
-      - 1900:1900/udp #optional
-      - 8843:8843 #optional
-      - 8880:8880 #optional
-      - 6789:6789 #optional
-      - 5514:5514/udp #optional
+    restart: unless-stopped
+  homeassistant:
+    image: lscr.io/linuxserver/homeassistant:latest
+    container_name: homeassistant
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/New_York
+    volumes:
+      - /home/docker/homeassistant/data:/config
+    ports:
+      - 8123:8123 #optional
+    devices:
+      - /path/to/device:/path/to/device #optional
     restart: unless-stopped
   homarr:
     container_name: homarr
@@ -231,4 +240,5 @@ networks:
         - subnet: 192.168.100.0/24
           gateway: 192.168.100.1
           ip_range: 192.168.100.2/32
+
 
