@@ -1,11 +1,16 @@
 services:
+  cloudflared:
+    container_name: cloudflared
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run --token # add token for Cloudflare tunnel here
+    restart: unless-started
   unifi-controller:
     image: jacobalberty/unifi:latest
     container_name: unifi-controller
     environment:
       - TZ=America/New_York
     volumes:
-      - /home/docker/unifi:/unifi
+      - /home/docker/docker/unifi:/unifi
     ports:
       - 8443:8443
       - 3478:3478/udp
@@ -20,11 +25,9 @@ services:
       - PGID=1000
       - TZ=America/New_York
     volumes:
-      - /home/docker/homeassistant/data:/config
+      - /home/docker/docker/homeassistant:/config
     ports:
-      - 8123:8123 #optional
-    devices:
-      - /path/to/device:/path/to/device #optional
+      - 8123:8123
     restart: unless-stopped
   homarr:
     container_name: homarr
@@ -35,63 +38,72 @@ services:
       - 7575:7575
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /home/docker/docker/homarr/appdata:/appdata
+      - /home/docker/docker/homarr:/appdata
     restart: unless-stopped
-  pihole:
-    container_name: pihole
-    image: pihole/pihole:latest
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
     environment:
+      - PUID=1000 # uid from data source
+      - PGID=1000 # gid from data source
       - TZ=America/New_York
-      - FTLCONF_webserver_api_password=??? #Add custom secure password
-      - FTLCONF_dns_listeningMode=all
-    ports:
-      - 53:53/tcp
-      - 53:53/udp
-      - 80:80/tcp
-      - 443:443/tcp
     volumes:
-      - /home/docker/docker/pihole/etc/pihole:/etc/pihole
-    networks:
-      pihole-network:
-        ipv4_address: 192.168.1.6
-        priority: 1000
-      pihole-bridge:
-        ipv4_address: 192.168.100.2
-        priority: 900
-    restart: unless-stopped
-  unbound:
-    container_name: unbound
-    image: klutchell/unbound:latest
-    volumes:
-      - /home/docker/docker/unbound:/etc/unbound
+      - /home/docker/docker/jellyfin:/config
+      - /mnt/NAS/shared/videos:/videos
+      - /mnt/NAS/shared/music:/music
+      - /mnt/NAS/shared/books:/books
     ports:
-      - 53:53/tcp
-      - 53:53/udp
-    networks:
-      pihole-network:
-        ipv4_address: 192.168.1.5
+      - 8096:8096
+      - 8920:8920
+      - 7359:7359/udp
+      - 1901:1900/udp
     restart: unless-stopped
-  plex:
-    image: lscr.io/linuxserver/plex:latest
-    container_name: plex
-    network_mode: host
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    depends_on:
+      - jellyfin
+      - sonarr
+      - radarr
     environment:
+      - LOG_LEVEL=debug
       - TZ=America/New_York
-      - VERSION=docker
-      #- PLEX_CLAIM= #optional
+    ports:
+      - 5055:5055
     volumes:
-      - /home/docker/docker/plex:/config
-      - /mnt/NAS/shared/TV/:/tv
-      - /mnt/NAS/shared/movies:/movies
-      - /mnt/NAS/shared/anime/shows:/anime/shows
-      - /mnt/NAS/shared/anime/movies:/anime/movies
-    restart: unless-stopped
+      - /home/docker/docker/jellyseerr:/app/config
+    restart: unless-stopped  
+#  gluetun:
+#    image: qmcgaw/gluetun
+#    container_name: gluetun
+#    cap_add:
+#      - NET_ADMIN
+#    devices:
+#      - /dev/net/tun:/dev/net/tun
+#    ports:
+#      - 12345:12345 # qBittorrent Web UI
+#      - 12346:12346 # qBittorrent torrent port
+#      - 12346:12346/udp
+#      - 9696:9696 # Prowlarr
+#      - 8989:8989 # Sonarr
+#      - 7878:7878 # Radarr
+#      - 8191:8191 # FlareSolverr
+#    volumes:
+#      - /home/docker/docker/gluetun:/gluetun
+#    environment:
+#      - VPN_SERVICE_PROVIDER=protonvpn
+#      - VPN_TYPE=openvpn
+#      - OPENVPN_USER= # User code from ProtonVPN
+#      - OPENVPN_PASSWORD= # Password from ProtonVPN
+#      - SERVER_COUNTRIES=Switzerland
+#      - TZ=America/New_York
+#    restart: unless-stopped
   kavita:
     image: lscr.io/linuxserver/kavita:latest
     container_name: kavita
     environment:
-      - PUID=1001
-      - PGID=1001
+      - PUID=1000 # uid from data source
+      - PGID=1000 # gid from data source
       - TZ=America/New_York
     volumes:
       - /home/docker/docker/kavita:/config
@@ -102,21 +114,24 @@ services:
   audiobookshelf:
     image: ghcr.io/advplyr/audiobookshelf:latest
     environment:
+      - PUID=1000 # uid from data source
+      - PGID=1000 # gid from data source
       - TZ=America/New_York
     volumes:
+      - /home/docker/docker/audiobookshelf/config:/config
+      - /home/docker/docker/audiobookshelf/metadata:/metadata
       - /mnt/NAS/shared/audiobooks:/audiobooks
       - /mnt/NAS/shared/podcasts:/podcasts
       - /mnt/NAS/shared/books:/books
-      - /home/docker/docker/audiobookshelf/config:/config
-      - /home/docker/docker/audiobookshelf/metadata:/metadata
     ports:
       - 13378:80
+    restart: unless-stopped  
   qbittorrent:
     image: lscr.io/linuxserver/qbittorrent:latest
     container_name: qbittorrent
     environment:
-      - PUID=1029
-      - PGID=100
+      - PUID=1000 # uid from data source
+      - PGID=1000 # gid from data source
       - TZ=America/New_York
       - WEBUI_PORT=12345
       - TORRENTING_PORT=12346
@@ -131,22 +146,16 @@ services:
   prowlarr:
     image: lscr.io/linuxserver/prowlarr:latest
     container_name: prowlarr
-    depends_on:
-      - qbittorrent
     environment:
-      - PUID=1029
-      - PGID=100
       - TZ=America/New_York
+    volumes:
+      - /home/docker/docker/prowlarr:/config
     ports:
       - 9696:9696
-    volumes:
-      - /home/docker/docker/prowlarr/config:/config
     restart: unless-stopped
   flaresolverr:
     container_name: flaresolverr
     image: ghcr.io/flaresolverr/flaresolverr:latest
-    depends_on:
-      - prowlarr
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - LOG_HTML=${LOG_HTML:-false}
@@ -158,17 +167,14 @@ services:
   sonarr:
     container_name: sonarr
     image: lscr.io/linuxserver/sonarr:latest
-    depends_on:
-      - qbittorrent
-      - prowlarr
     environment:
-      - PUID=1029
-      - PGID=100
+      - PUID=1000 # uid from data source
+      - PGID=1000 # gid from data source
       - TZ=America/New_York
     ports:
       - 8989:8989
     volumes:
-      - /home/docker/docker/sonarr/config:/config
+      - /home/docker/docker/sonarr:/config
       - /mnt/NAS/shared/TV:/tv
       - /mnt/NAS/shared/anime/shows:/anime
       - /mnt/NAS/downloads:/downloads
@@ -176,41 +182,26 @@ services:
   radarr:
     container_name: radarr
     image: lscr.io/linuxserver/radarr:latest
-    depends_on:
-      - qbittorrent
-      - prowlarr
     environment:
-      - PUID=1029
-      - PGID=100
+      - PUID=1000 # uid from data source
+      - PGID=1000 # gid from data source
       - TZ=America/New_York
     ports:
       - 7878:7878
     volumes:
-      - /home/docker/docker/radarr/config:/config
+      - /home/docker/docker/radarr:/config
       - /mnt/NAS/shared/movies:/movies
       - /mnt/NAS/shared/anime/movies:/anime
       - /mnt/NAS/downloads:/downloads
     restart: unless-stopped
-  handbrake:
-    image: jlesage/handbrake:latest
-    container_name: handbrake
-    environment:
-      - PUID=1029
-      - PGID=100
-      - TZ=America/New_York
-    volumes:
-      - /home/docker/docker/handbrake/config:/config
-      - /mnt/NAS/downloads/convert/watch:/watch
-      - /mnt/NAS/downloads/convert/output:/output
-    restart: unless-stopped
-  calibre: #Used for adding metadata to ebooks
+  calibre:
     image: lscr.io/linuxserver/calibre:latest
     container_name: calibre
     #security_opt:
     #  - seccomp:unconfined #optional
     environment:
-      - PUID=1029
-      - PGID=100
+      - PUID=1000 # uid from data source
+      - PGID=1000 # gid from data source
       - TZ=America/New_York
       #- PASSWORD= #optional
       #- CLI_ARGS= #optional
@@ -222,23 +213,3 @@ services:
       - 8181:8181
       - 8081:8081
     restart: unless-stopped
-
-networks:
-  pihole-network:
-    driver: macvlan
-    driver_opts:
-      parent: eth0
-    ipam:
-      config:
-        - subnet: 192.168.1.0/24
-          ip_range: 192.168.1.0/24
-          gateway: 192.168.1.1
-  pihole-bridge:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 192.168.100.0/24
-          gateway: 192.168.100.1
-          ip_range: 192.168.100.2/32
-
-
