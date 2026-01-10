@@ -4,9 +4,9 @@ services:
     image: cloudflare/cloudflared:latest
     command: tunnel --no-autoupdate run --token # add token for Cloudflare tunnel here
     restart: unless-started
-  unifi-controller:
+  unifi:
     image: jacobalberty/unifi:latest
-    container_name: unifi-controller
+    container_name: unifi
     environment:
       - TZ=America/New_York
     volumes:
@@ -61,10 +61,6 @@ services:
   jellyseerr:
     image: fallenbagel/jellyseerr:latest
     container_name: jellyseerr
-    depends_on:
-      - jellyfin
-      - sonarr
-      - radarr
     environment:
       - LOG_LEVEL=debug
       - TZ=America/New_York
@@ -213,3 +209,4 @@ services:
       - 8181:8181
       - 8081:8081
     restart: unless-stopped
+
