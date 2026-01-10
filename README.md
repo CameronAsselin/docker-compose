@@ -10,14 +10,15 @@ This is the docker-compose.yml file used to spin up docker containers on my home
 - jellyseerr
 - gluetun
 - kavita
+- calibre
 - audiobookshelf
 - qbittorrent
 - prowlarr
 - flaresolverr
 - sonarr
 - radarr
-- calibre
-
+- apache-php
+  
 Run the file using docker-compose:
 
 ```
