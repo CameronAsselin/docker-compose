@@ -4,6 +4,7 @@ This is the docker-compose.yml file used to spin up docker containers on my home
 
 - cloudflared
 - unifi
+- openvpn
 - homeassistant
 - homarr
 - jellyfin
@@ -19,19 +20,19 @@ This is the docker-compose.yml file used to spin up docker containers on my home
 - radarr
 - apache-php
   
-Run the file using docker-compose:
+Spin up the containers:
 
 ```
 docker-compose up -d
 ```
 
-Stop all containers using docker-compose
+Stop all containers:
 
 ```
 docker-compose down
 ```
 
-Update all stopped containers using docker-compose:
+Update all images:
 
 ```
 docker-compose pull
