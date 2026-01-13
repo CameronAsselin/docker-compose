@@ -16,6 +16,21 @@ services:
       - 3478:3478/udp
       - 8080:8080
     restart: unless-stopped
+  openvpn:
+    image: openvpn/openvpn-as
+    container_name: openvpn
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - MKNOD
+    ports:
+      - 943:943
+      - 443:443
+      - 1194:1194/udp
+    volumes:
+      - /home/docker/docker/openvpn:/openvpn
+    restart: unless-stopped
   homeassistant:
     image: lscr.io/linuxserver/homeassistant:latest
     container_name: homeassistant
@@ -217,5 +232,6 @@ services:
     volumes:
       - /home/docker/docker/apache:/var/www/html
     restart: unless-stopped
+
 
 
