@@ -55,6 +55,14 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /home/docker/docker/homarr:/appdata
     restart: unless-stopped
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    restart: unless-stopped
+    ports:
+      - 3001:3001
+    volumes:
+      - /home/docker/docker/uptime-kuma:/app/data
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
@@ -73,8 +81,9 @@ services:
       - 7359:7359/udp
       - 1901:1900/udp
     restart: unless-stopped
-  jellyseerr:
-    image: fallenbagel/jellyseerr:latest
+  seerr:
+    image: ghcr.io/seerr-team/seerr:latest
+    init: true
     container_name: jellyseerr
     environment:
       - LOG_LEVEL=debug
@@ -82,7 +91,7 @@ services:
     ports:
       - 5055:5055
     volumes:
-      - /home/docker/docker/jellyseerr:/app/config
+      - /home/docker/docker/seerr:/app/config
     restart: unless-stopped  
 #  gluetun:
 #    image: qmcgaw/gluetun
