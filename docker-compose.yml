@@ -55,14 +55,22 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /home/docker/docker/homarr:/appdata
     restart: unless-stopped
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    ports:
+      - 80:80
+    volumes:
+      - /home/docker/docker/vaultwarden:/data
+    restart: unless-stopped
   uptime-kuma:
     image: louislam/uptime-kuma:latest
     container_name: uptime-kuma
-    restart: unless-stopped
     ports:
       - 3001:3001
     volumes:
       - /home/docker/docker/uptime-kuma:/app/data
+    restart: unless-stopped
   jellyfin:
     image: lscr.io/linuxserver/jellyfin:latest
     container_name: jellyfin
