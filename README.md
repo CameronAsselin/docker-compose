@@ -7,6 +7,7 @@ This is the docker-compose.yml file used to spin up docker containers on my home
 - openvpn
 - homeassistant
 - homarr
+- vaultwarden
 - uptime-kuma
 - jellyfin
 - seerr
