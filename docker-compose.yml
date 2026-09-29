@@ -169,7 +169,6 @@ services:
       - /home/docker/docker/audiobookshelf/metadata:/metadata
       - /mnt/NAS/shared/audiobooks:/audiobooks
       - /mnt/NAS/shared/podcasts:/podcasts
-      - /mnt/NAS/shared/books:/books
     ports:
       - 13378:80
     restart: unless-stopped  
