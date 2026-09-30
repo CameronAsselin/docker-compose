@@ -83,6 +83,8 @@ services:
       - /mnt/NAS/shared/videos:/videos
       - /mnt/NAS/shared/music:/music
       - /mnt/NAS/shared/books:/books
+      - /mnt/NAS/shared/audiobooks:/audiobooks
+      - /mnt/NAS/shared/podcasts:/podcasts
     ports:
       - 8096:8096
       - 8920:8920
